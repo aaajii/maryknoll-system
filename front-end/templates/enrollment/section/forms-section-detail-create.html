@@ -8,7 +8,7 @@
   <div class="row">
     <div class="col-md-4">
       <label>Student ID:</label>
-      <input onchange="updateDetails();"list="students" type="text" name="student_ID" class="form-control student-input" required><!-- Auto generate-->
+      <input onkeyup="updateDetails();"onchange="updateDetails();"list="students" type="text" name="student_ID" class="form-control student-input" required><!-- Auto generate-->
       <datalist id="students">
         {% for student in student_list %}
           <option value="{{student.pk}}"></option>
@@ -24,8 +24,3 @@
     <button type="submit" class="btn btn-primary "><i class="fa fa-check-circle" aria-hidden="true"></i> Save Student to Section</button>
   </div>
 </form>
-<script>
-    $(function() {
-      alert("henlo")
-    });
-</script>

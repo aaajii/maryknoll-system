@@ -17,7 +17,38 @@
 {# BACKEND SCRIPTS #}
 
 <script>
-
+$(function() {
+    $.ajax({
+            url: '{% url "section-detail-form" section.pk %}',
+            type: 'get',
+            dataType: 'json',
+            success: function(data) {
+                $(".content").html(data.html_form);
+                updateDetails()
+            }
+    });
+    //For student details
+    
+    $(".content").on("submit", ".section-detail-form", function() {
+        var form = $(this);
+        $.ajax({
+            url: '{% url "section-detail-form" section.pk%}',
+            data: form.serialize(),
+            type: form.attr("method"),
+            dataType: 'json',
+            success: function(data) {
+                if (data.form_is_valid) {
+                    window.location = "{%url 'section-detail' section.pk %}"
+                }
+                else {
+                    console.log(data.form_is_valid);
+                    $(".content").html(data.html_form);
+                }
+            }
+        });
+        return false;
+    });
+    });
 function updateDetails(){
     $.ajax({
         url: '{% url "student-names" %}?student='+$(".student-input").val(),
@@ -28,39 +59,6 @@ function updateDetails(){
         }
     });
 }
-
-$(function() {
-  $.ajax({
-        url: '{% url "section-detail-form" section.pk %}',
-        type: 'get',
-        dataType: 'json',
-        success: function(data) {
-            $(".content").html(data.html_form);
-        }
-  });
-  //For student details
-  updateDetails()
-  $(".content").on("submit", ".section-detail-form", function() {
-    var form = $(this);
-    $.ajax({
-        url: '{% url "section-detail-form" section.pk%}',
-        data: form.serialize(),
-        type: form.attr("method"),
-        dataType: 'json',
-        success: function(data) {
-            if (data.form_is_valid) {
-                window.location = "{%url 'section-detail' section.pk %}"
-            }
-            else {
-                console.log(data.form_is_valid);
-                $(".content").html(data.html_form);
-            }
-        }
-    });
-    return false;
-});
-});
-
 
 </script>
 {%endblock%}

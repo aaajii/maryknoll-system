@@ -316,7 +316,7 @@ def sectionDetailAdd(request, pk='pk', template = 'enrollment/section/section-de
 
 def sectionDetailForm(request,pk,template='enrollment/section/forms-section-detail-create.html'):
     section = get_object_or_404(Section, pk=pk)
-    students = Enrollment.objects.all()
+    students = Enrollment.objects.filter(~Q(enrollment_status='x'))
     context = {'section': section,'student_list':students}
     data = {}
     data['form_is_valid'] = False
