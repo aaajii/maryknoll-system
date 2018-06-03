@@ -1,39 +1,61 @@
-administrative/__init__.pyc
-administrative/admin.pyc
-administrative/forms.pyc
-administrative/models.pyc
-administrative/urls.pyc
-administrative/views.pyc
-administrative/reports_class.pyc
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyc
 
-cashier/__init__.pyc
-cashier/admin.pyc
-cashier/forms.pyc
-cashier/models.pyc
-cashier/urls.pyc
-cashier/views.pyc
+# sqlite
+*.sqlite3
 
-enrollment/__init__.pyc
-enrollment/admin.pyc
-enrollment/forms.pyc
-enrollment/models.pyc
-enrollment/urls.pyc
-enrollment/views.pyc
+# C extensions
+*.so
 
-registration/__init__.pyc
-registration/admin.pyc
-registration/forms.pyc
-registration/models.pyc
-registration/urls.pyc
-registration/views.pyc
+# Distribution / packaging
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
 
-main/__init__.pyc
-main/admin.pyc
-main/forms.pyc
-main/models.pyc
-main/urls.pyc
-main/views.pyc
-main/wsgi.pyc
-main/settings.pyc
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+logfile
 
-db.sqlite3
+# Unit test / coverage reports
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+
+# Frontend
+node_modules/
+
+# Mac-specific
+.DS_Store
+
+local.py
+production.py
+/static
+/media
+
+# Google API secret json
+client_secret.json
+
+# Virtualenv
+env
+
+# Celery
+celerybeat.pid
+
