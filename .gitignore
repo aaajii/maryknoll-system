@@ -47,8 +47,8 @@ node_modules/
 
 local.py
 production.py
-/static
-/media
+# /static
+# /media
 
 # Google API secret json
 client_secret.json
