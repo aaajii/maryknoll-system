@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.views import generic
 from django.utils import timezone
 from datetime import datetime
@@ -8,6 +8,7 @@ from dal import autocomplete
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
+from django.contrib import messages
 # Create your views here.
 from .models import *
 from registration.models import *
@@ -41,6 +42,17 @@ def updateInstance(request, modelForm, instance):
     else:
         form = modelForm(instance = instance)
     return form
+
+def deleteInstance(request, modelForm, instance):
+    if request.method == 'POST':
+        form = modelForm(request.POST, instance = instance)
+        if form.is_valid():
+            instance = form.save()
+            instance.delete()
+    else:
+        form = modelForm(instance = instance)
+    return form
+
 def getLatest(model, attribute):
     # Get latest record of a model, basing on a certain attribute
     # Returns an instance
@@ -70,23 +82,28 @@ def getSectionList(request):
         int(search)
     except:
         isNum = False
+        
+    if(genre == "Category"):
+        genre = "All categories"
+        
     if(request.GET.get('search')!= "None"):
         if( (genre == "None" or genre == "All Categories") and isNum):
             query = Section.objects.filter(
                 Q(section_ID__contains=search)|
+                Q(room__icontains=search)|
                 Q(section_name__icontains=search)|
                 Q(section_capacity__contains=search)|
                 Q(adviser__first_name__icontains=search)|
-                Q(adviser__last_name__icontains=search)|
-                Q(room__icontains=search)
+                Q(adviser__last_name__icontains=search)
             )
         if(genre == "None" or genre == "All categories"):
             query = Section.objects.filter(
                 Q(section_ID__contains=search)|
+                Q(room__icontains=search)|
                 Q(section_name__icontains=search)|
                 Q(section_capacity__contains=search)|
-                Q(adviser__icontains=search)|
-                Q(room__icontains=search)
+                Q(adviser__first_name__icontains=search)|
+                Q(adviser__last_name__icontains=search)
             )
         elif(genre == "Section ID"):
             print "id"
@@ -101,31 +118,39 @@ def getSectionList(request):
         else:
             print "wala"
             query = Section.objects.all() 
-            
+    elif(request.GET.get('search') == "None"):     
+        query = Section.objects.all() 
     else:
         return []
     return query
+    
 def getScholarshipList(request):
     search = request.GET.get('search')
     genre = request.GET.get('genre')
     isNum = True
     try:
-        int(search)
+        float(search)
     except:
         isNum = False
+    
+    if(genre == "Category"):
+        genre = "All categories"
+        
     if(request.GET.get('search')!= "None"):
         if( (genre == "None" or genre == "All Categories") and isNum):
             query = Scholarship.objects.filter(
                 Q(pk__contains=search)|
+                Q(fee_amount__icontains=search)|
                 Q(scholarship_name__icontains=search)|
-                Q(school_year__contains=search)|
+                Q(school_year__icontains=search)|
                 Q(scholarship_type__icontains=search)
             )
         if(genre == "None" or genre == "All categories"):
             query = Scholarship.objects.filter(
                 Q(pk__contains=search)|
+                Q(fee_amount__icontains=search)|
                 Q(scholarship_name__icontains=search)|
-                Q(school_year__contains=search)|
+                Q(school_year__icontains=search)|
                 Q(scholarship_type__icontains=search)
             )
         elif(genre == "Scholarship ID"):
@@ -152,6 +177,10 @@ def getOfferingList(request, pk):
         int(search)
     except:
         isNum = False
+    
+    if(genre == "Category"):
+        genre = "All categories"
+        
     if(request.GET.get('search')!= "None"):
         if( (genre == "None" or genre == "All Categories") and isNum):
             query = Offering.objects.filter(
@@ -306,14 +335,15 @@ def tableSectionDetail(request, pk='pk',template='enrollment/section/table-secti
     section_page = paginateThis(request, section_enrollee_list, 50)
 
     context = {'section_enrollee_list': section_page}
-
-    return ajaxTable(request,template,context)
+    
+    html_form = render_to_string(template, context, request = request,)
+    return JsonResponse({'html_form' : html_form})
 
 def sectionDetailAdd(request, pk='pk', template = 'enrollment/section/section-details-add.html'):
     section = get_object_or_404(Section, pk=pk)
     context = {'section': section}
     return render(request, template, context)
-
+    
 def sectionDetailForm(request,pk,template='enrollment/section/forms-section-detail-create.html'):
     section = get_object_or_404(Section, pk=pk)
     students = Enrollment.objects.filter(~Q(enrollment_status='x'))
@@ -337,8 +367,14 @@ def studentNames(request,template="enrollment/section/student-details.html"):
         student = None
     context = {'student':student}
     return ajaxTable(request,template,context)
+    
+def generateSectionForm(request):
+    student = None
+    context = {'student':student}
+    return ajaxTable(request,template,context)
 
 def generateSectionForm(request,template='enrollment/section/forms-section-create.html'):
+
     data = {'form_is_valid' : False }
     last_section = getLatest(Section,'section_ID')
    
@@ -376,6 +412,7 @@ def form_editSection(request, pk='pk', template = 'enrollment/section/forms-sect
     context = {'forms': forms, 'section':last_section, 'instance': instance}
     return ajaxTable(request,template,context,data)
     
+
 #--------------------------------------SCHOLARSHIP----------------------------------------------------
 @login_required
 def scholarshipList(request, template = 'enrollment/scholarship/scholarship-list.html'):
@@ -386,10 +423,22 @@ def addScholarshipProfile(request, template = 'enrollment/scholarship/scholarshi
     
 def tableScholarshipList(request, template = 'enrollment/scholarship/table-scholarship-list.html'):
     schoolyear_list = getScholarshipList(request)
-    scholarship = paginateThis(request, schoolyear_list, 5)
-        
+    #Pagination
+    page = request.GET.get('page', 1)
+    paginator = Paginator(schoolyear_list, 5)
+    
+    try:
+        scholarship = paginator.page(page)
+    except PageNotAnInteger:
+        scholarship = paginator.page(1)
+    except EmptyPage:
+        scholarship = paginator.page(paginator.num_pages)
     context = {'scholarship_list': scholarship}
-    return ajaxTable(request,template,context)
+    html_form = render_to_string(template,
+        context,
+        request = request,
+    )
+    return JsonResponse({'html_form' : html_form})
 
 def createScholarshipProfile(request, template = 'enrollment/scholarship/forms-scholarship-create.html'):
     data = {'form_is_valid' : False }
@@ -510,6 +559,45 @@ def editSubjectOfferingForm(request, pk='pk',template = 'enrollment/subject-offe
     last_subjectOffering = getLatest(Offering, 'subjectOffering_ID')
     forms = updateInstance(request, SubjectOfferingForms, instance)
 
+def getOfferingList(request, pk):
+    search = request.GET.get('search')
+    genre = request.GET.get('genre')
+    isNum = True
+    try:
+        int(search)
+    except:
+        isNum = False
+    if(request.GET.get('search')!= "None"):
+        if( (genre == "None" or genre == "All Categories") and isNum):
+            query = Offering.objects.filter(
+                Q(offering_ID__icontains=search)|
+                Q(subject__subject_name__icontains=search)|
+                Q(teacher__first_name__icontains==search)|
+                Q(teacher__last_name__icontains==search)|
+                Q(section__section_name__icontains=search)
+            )
+        if(genre == "None" or genre == "All categories"):
+            query = Offering.objects.filter(
+                Q(offering_ID__icontains=search)|
+                Q(subject__subject_name__icontains=search)|
+                Q(teacher__first_name__icontains==search)|
+                Q(teacher__first_name__icontains==search)|
+                Q(section__section_name__icontains=search)
+            )
+        elif(genre == "Offering ID"):
+            print "id"
+            query = Offering.objects.filter(offering_ID__icontains=search)
+        elif(genre == "Subject Description"):
+            query = Offering.objects.filter(subject__subject_name__icontains=search)
+        elif(genre == "Teacher Assigned"):
+            query = Offering.objects.filter( Q(teacher__first_name__icontains==search)|
+                Q(teacher__last_name__icontains==search))
+        elif(genre == "Section Assigned"):
+            query = Offering.objects.filter(section__section_name__icontains=search)
+        else:
+            print "wala"
+            query = Offering.objects.all() 
+           
     if forms.is_valid():
         data['form_is_valid'] = True
     else:
@@ -569,12 +657,28 @@ def form_editSchoolYear(request, pk='pk', template = 'enrollment/school-year/for
 
     context = {'forms': forms, 'school_year':last_school_year, 'instance': instance}
     return ajaxTable(request,template,context,data)
-
-def delete_schoolYear(request, pk='pk'):
+ 
+def deleteSchoolYear(request, pk='pk',template = 'enrollment/school-year/school-year-list-delete.html'):
     instance = get_object_or_404(School_Year, pk=pk)
-    instance.delete()
-    message.success(request, "Deleted!")
-    return redirect('enrollment:schoolyear-list')
+    context = {'instance': instance}
+    return render(request, template, context)
+
+def form_deleteSchoolYear(request, pk='pk', template = 'enrollment/school-year/forms-schoolyear-delete.html'):
+    instance = get_object_or_404(School_Year, pk=pk)
+    data = {'form_is_valid' : False }
+    last_school_year = getLatest(School_Year, School_Year._meta.pk)
+
+    forms = deleteInstance(request, School_YearForm, instance)
+    
+    if forms.is_valid():
+        data['form_is_valid'] = True
+    else:
+        data['form_is_valid'] = False
+    
+    
+
+    context = {'forms': forms, 'school_year':last_school_year, 'instance': instance}
+    return ajaxTable(request,template,context,data)
 
 #--------------------------------------YEAR LEVEL------------------------------------------------
 
@@ -630,7 +734,7 @@ def form_editYearLevel(request, pk='pk', template = 'enrollment/year-level/forms
 def delete_yearLevel(request, pk='pk'):
     instance = get_object_or_404(YearLevel, pk=pk)
     instance.delete()
-    message.success(request, "Deleted!")
+    messages.success(request, "Deleted!")
     return redirect('enrollment:year-level-list')
     
 def deleteSubj(request):
@@ -685,7 +789,7 @@ class sectionDetailFormAutoComp(autocomplete.Select2QuerySetView):
             context,
             request=request,
         )
-        return JsonResponse(data
+        return JsonResponse(data)
 
 
 '''
