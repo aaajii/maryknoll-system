@@ -1,11 +1,16 @@
+from __future__ import absolute_import
 from __future__ import unicode_literals
+
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.core.urlresolvers import reverse
-#from registration.models import Student
-#from enrollment.models import School_Year
 
-# Create your models here.
+from registration.models import (
+	Student
+)
+from enrollment.models import (
+	School_Year
+)
 
 CASHIER = 'c'
 REGISTRAR = 'r'
@@ -68,7 +73,7 @@ class Employee(models.Model):
 	def __str__(self):
 		return "%s, %s" % (self.last_name, self.first_name)
 		
-	def get_abosulute_url(self):
+	def get_absolute_url(self):
 	    return reverse('employee-list', kwargs={"id": self.id})
 	
 ON_HOLD = "h"
@@ -77,13 +82,13 @@ DECLINED = "d"
 
 class Promissory(models.Model):
 	promissory_ID = models.AutoField(primary_key=True)
-	promisorry_title = models.CharField(max_length=200)
+	promissory_title = models.CharField(max_length=200)
 	reason = models.CharField(max_length=500)
 	date_filed = models.DateTimeField(null=True, blank=True, auto_now = True)
 	date_approved = models.DateTimeField(null=True, blank=True, auto_now = True)
 	due_of_payment = models.DateTimeField(null=True, blank=True)
-	student_ID = models.ForeignKey('registration.Student', on_delete=models.CASCADE, default=0)
-	schoolYr_ID = models.ForeignKey('enrollment.School_Year', on_delete=models.CASCADE, default=0)
+	student_ID = models.ForeignKey(Student, on_delete=models.CASCADE, default=0)
+	schoolYr_ID = models.ForeignKey(School_Year, on_delete=models.CASCADE, default=0)
 	STATUS_CHOICES = (
 	    (ON_HOLD, 'On Hold'),
 	    (APPROVED, 'Approved'),
