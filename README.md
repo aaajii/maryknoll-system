@@ -19,24 +19,14 @@ To get yourself a copy of the project up and running on your local machine for d
 
 ### Prerequisites
 
-The project strictly requires the latest version of python 2 (or 3) and Django1.9 .
+The project requires the latest version of python 3 and Django3.0.3
+
+
+Install all the requirements provided in the requirements.txt and then you are good to go.
 
 Assuming you are using any linux OS (or git bash on windows), you can run this in your command line:
 ```
-sudo apt-get update
-sudo apt-get install python-pip
-sudo pip install django==1.9
-```
-
-To check if you have successfully installed django and its version:
-```
-django-admin --version
-```
-
-lastly, this project uses django-widget-tweaks. To install this:
-
-```
-sudo pip install django-widget-tweaks
+pip install -r requirements.txt
 ```
 
 ## Running the tests

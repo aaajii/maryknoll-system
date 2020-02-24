@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404, redirect, render_to_response
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 from django.utils import timezone
 from datetime import datetime
@@ -106,7 +106,6 @@ def getSectionList(request):
                 Q(adviser__last_name__icontains=search)
             )
         elif(genre == "Section ID"):
-            print "id"
             query = Section.objects.filter(section_ID__contains=search)
         elif(genre == "Section Name"):
             query = Section.objects.filter(section_name__icontains=search)
@@ -116,7 +115,6 @@ def getSectionList(request):
             query = Section.objects.filter(Q(adviser__first_name__icontains=search)|
                 Q(adviser__last_name__icontains=search))
         else:
-            print "wala"
             query = Section.objects.all() 
     elif(request.GET.get('search') == "None"):     
         query = Section.objects.all() 
@@ -154,7 +152,6 @@ def getScholarshipList(request):
                 Q(scholarship_type__icontains=search)
             )
         elif(genre == "Scholarship ID"):
-            print "id"
             query = Scholarship.objects.filter(pk__contains=search)
         elif(genre == "Scholarship Name"):
             query = Scholarship.objects.filter(scholarship_name__icontains=search)
@@ -163,7 +160,6 @@ def getScholarshipList(request):
         elif(genre == "Scholarship Type"):
             query = Scholarship.objects.filter(scholarship_type__icontains=search)
         else:
-            print "wala"
             query = Scholarship.objects.all()
             
     else:
@@ -199,7 +195,6 @@ def getOfferingList(request, pk):
                 Q(section__section_name__icontains=search)
             )
         elif(genre == "Offering ID"):
-            print "id"
             query = Offering.objects.filter(offering_ID__contains=search)
         elif(genre == "Subject Description"):
             query = Offering.objects.filter(subject__subject_name__icontains=search)
@@ -209,7 +204,6 @@ def getOfferingList(request, pk):
         elif(genre == "Section Assigned"):
             query = Offering.objects.filter(section__section_name__icontains=search)
         else:
-            print "wala"
             query = Offering.objects.all() 
             
     else:
@@ -452,7 +446,7 @@ def createScholarshipProfile(request, template = 'enrollment/scholarship/forms-s
             form.save()
             data['form_is_valid'] = True
         else:
-            print form.errors
+            print(form.errors)
             data['form_is_valid'] = False
     else:
         form = ScholarshipForms()
@@ -585,7 +579,6 @@ def getOfferingList(request, pk):
                 Q(section__section_name__icontains=search)
             )
         elif(genre == "Offering ID"):
-            print "id"
             query = Offering.objects.filter(offering_ID__icontains=search)
         elif(genre == "Subject Description"):
             query = Offering.objects.filter(subject__subject_name__icontains=search)
@@ -595,7 +588,6 @@ def getOfferingList(request, pk):
         elif(genre == "Section Assigned"):
             query = Offering.objects.filter(section__section_name__icontains=search)
         else:
-            print "wala"
             query = Offering.objects.all() 
            
     if forms.is_valid():

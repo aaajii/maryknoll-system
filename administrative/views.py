@@ -80,7 +80,6 @@ from django.http import JsonResponse
 
 def tableEmployeeList(request):
     employee_list = getEmployeeList(request)
-    print employee_list
     #Pagination
     page = request.GET.get('page', 1)
     paginator = Paginator(employee_list, 5)
@@ -173,7 +172,6 @@ def getEmployeeList(request):
                 Q(emp_status__contains=search)
             )
         elif(genre == "Full Name"):
-            print "name"
             query = Employee.objects.filter(
                 Q(first_name__icontains=search)|
                 Q(last_name__icontains=search)
@@ -187,7 +185,6 @@ def getEmployeeList(request):
         elif(genre == "Status"):
             query = Employee.objects.filter(emp_status=search)
         else:
-            print "wala"
             query = Employee.objects.all()
     else:
         return []

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 from .forms import *
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -276,7 +276,7 @@ def testView(request,pk='pk', template="test.html"):
                             month = None,
                         )
 
-                        print "%s - %s" % (str(new_transaction), str(new_payment))
+                        print("%s - %s" % (str(new_transaction), str(new_payment)))
             elif data['particularType'] == 'TuitionFee':
                 if data['payment_method'] != 'Others':
                     new_transaction = EnrollmentTransactionsMade.objects.create(
@@ -295,10 +295,10 @@ def testView(request,pk='pk', template="test.html"):
                             # Details
                             month = month,
                     )
-                    print "Success!"
+                    print("Success!")
             
         except Exception as error:
-            print error
+            print(error)
             return HttpResponseRedirect('student-list')        
         
     context = {'something':data}

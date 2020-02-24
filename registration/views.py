@@ -106,7 +106,6 @@ def getStudentList(request, status = None):
             # This needs debugging. ex. JUNIOR_HIGH == 'j' but input is "Junior High"
             query = Student.objects.filter(student_level=search)
         else:
-            print "All Students Returned!"
             query = Student.objects.all() 
             
     else:
@@ -128,7 +127,6 @@ def verifyActive():
         if ((curr_schoolyear == None) or (last_record == None)):
             break
         elif (curr_schoolyear == last_record.school_year):
-            print curr_student.status
             curr_student.status = "a"
             curr_student.save()
 
@@ -156,7 +154,6 @@ def table_ActiveList(request, template = 'registrar/student-profiles/table-stude
     limited_students = paginateThis(request, student_list, 10)
 
     context = {'student_list': limited_students}
-    print context
     return ajaxTable(request, template, context)
 
 def table_InActiveList(request, template = 'registrar/student-profiles/table-student-list.html'):
@@ -168,7 +165,6 @@ def table_InActiveList(request, template = 'registrar/student-profiles/table-stu
 
     
     context = {'student_list': limited_students}
-    print context
     return ajaxTable(request, template, context)
 
 def table_ScholarList(request, template = 'registrar/student-profiles/table-student-list.html'):
@@ -190,7 +186,6 @@ def table_ScholarList(request, template = 'registrar/student-profiles/table-stud
 
     
     context = {'student_list': limited_students}
-    print context
     return ajaxTable(request, template, context)
 
 def addStudent(request, template = 'registrar/student-profiles/student-registration-list-add.html'):
@@ -240,7 +235,6 @@ def studentDetails(request, pk='pk', template='registrar/student-registration/st
         last_record = Enrollment.objects.filter(student=current_student).latest('enrollment_ID')
     except:
         last_record = Enrollment.objects.filter(student=current_student)
-    print last_record
     return render(request, template, {'student': current_student, 'record':last_record})
 def table_studentDetails(request, pk='pk', template = 'registrar/student-registration/table-student-profile.html'):
     #verifyScholarship()
@@ -274,7 +268,6 @@ def form_addEnrollment(request, pk='pk', template = 'registrar/student-registrat
             form.save()
             data['form_is_valid'] = True
         else:
-            print form.errors
             data['form_is_valid'] = False
     else:
         form = RegistrationForms()
@@ -337,7 +330,7 @@ def StudentScholarFormView(request, pk='pk',template = "registrar/student-regist
             form.save()
             return HttpResponseRedirect(reverse('student-details',kwargs={'pk':regist.student.student_ID}))
         else:
-            print form.errors
+            print(form.errors)
     else:
         form = StudentScholarForm()
     
