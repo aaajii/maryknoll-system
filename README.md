@@ -43,7 +43,7 @@ In case you want to run your Django application from the terminal just run:
 
 ## Built With
 
-* [Django 1.9](https://docs.djangoproject.com/en/2.0/releases/1.9/) - The web framework used
+* [Django 3](https://docs.djangoproject.com/en/3.0/) - The web framework used
 
 ## Deployment
 
@@ -73,5 +73,4 @@ import necessary virtual environments first if needed!
 
 * Hat tip to anyone who's code was used
 * Inspiration
-* chynna
 
